@@ -1,1 +1,10 @@
+# Python stuff
 .venv
+venv
+__pycache__
+
+# Key files
+*.pem
+
+# Bin dumps used for initial dev/debugging
+*.bin

