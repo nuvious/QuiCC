@@ -18,12 +18,38 @@ cd QuiCC
 
 ### Generate RSA keys for the covert channel
 
+Generate RSA keys for the client and the server.
+
+#### Server and client running on local host
+
 ```bash
 openssl genpkey -algorithm RSA -out server_key.pem -pkeyopt rsa_keygen_bits:4096
 openssl genpkey -algorithm RSA -out client_key.pem -pkeyopt rsa_keygen_bits:4096
 openssl rsa -in client_key.pem -pubout -out client_public_key.pem
 openssl rsa -in server_key.pem -pubout -out server_public_key.pem
 ```
+
+#### Server and client running on separate hosts
+
+If you're running the server on a separate machine, you'll need to change out
+the example key and cert used by the server to ones that match your server
+host IP. You'll need to add a entry to the dns record for the ip used; in this
+case I used `quicc.local`.
+
+On the server run the below in the root of the project:
+
+```bash
+openssl genrsa -out ca-key.pem 4096
+openssl req -new -x509 -days 365 -key ca-key.pem -out aioquic/tests/pycacert.pem -subj '/CN=QuiCCA'
+openssl genrsa -out aioquic/tests/ssl_key.pem 4096
+openssl req -new -key aioquic/tests/ssl_key.pem -out csr.pem -subj '/CN=quicc.local' -nodes
+openssl x509 -req -in csr.pem -out aioquic/tests/ssl_cert.pem \
+    -CA aioquic/tests/pycacert.pem -CAkey ca-key.pem -CAcreateserial -days 3650 \
+  -extfile <(printf "subjectAltName=DNS:quicc.local\nkeyUsage=digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth,clientAuth\nbasicConstraints=CA:FALSE\nsubjectKeyIdentifier=hash\nauthorityKeyIdentifier=keyid,issuer\nauthorityInfoAccess=caIssuers;URI:http://testca.pythontest.net/testca/pycacert.cer,OCSP;URI:http://testca.pythontest.net/testca/ocsp/\ncrlDistributionPoints=URI:http://testca.pythontest.net/testca/revocation.crl")
+```
+
+You'll then need to copy over the `pycacert.pem` and repace the
+`aioquic/tests/pycacert.pem` file with it on the client machine.
 
 ### Install Requirements
 
@@ -56,6 +82,9 @@ python http3_cc_client.py \
      wss://localhost:4433/ws
 ```
 
+NOTE: If running the client and server on separate hosts, replace `localhost`
+with the DNS entry; in this example `quicc.local`.
+
 ### Send a file
 
 ```bash
@@ -67,3 +96,6 @@ python http3_cc_client.py \
     --cc-server-public-key server_public_key.pem \
     wss://localhost:4433/ws
 ```
+
+NOTE: If running the client and server on separate hosts, replace `localhost`
+with the DNS entry; in this example `quicc.local`.
