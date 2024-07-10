@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 import aioquic
 import wsproto
 import wsproto.events
+from aioquic.quic import ccrypto
 from aioquic.quic.connection import GLOBAL_CID_QUEUE, RSA_BIT_STRENGTH, GLOBAL_BYTE_ORDER
 from aioquic.asyncio.client import connect
 from aioquic.asyncio.protocol import QuicConnectionProtocol
@@ -30,7 +31,6 @@ from aioquic.quic.packet import QuicProtocolVersion
 from aioquic.tls import CipherSuite, SessionTicket
 
 from Crypto.PublicKey import RSA
-import ccrypto
 
 try:
     import uvloop
@@ -614,15 +614,16 @@ if __name__ == "__main__":
     cid_payloads = []
     command = None
     payload = None
+    keyed_payload = None
     # Chunk the messages or file into 6-byte chunks
     if args.message:
         command = b'm'
-        message_bytes = message.encode('utf8')
-        payload = command + len(message_bytes).to_bytes(4, byteorder=GLOBAL_BYTE_ORDER) + message_bytes
+        message_bytes = args.message.encode('utf8')
+        payload = command + message_bytes
     elif args.file:
         command = b'f'
         file_bytes = open(args.file, 'rb').read()
-        payload = command + len(file_bytes).to_bytes(4, byteorder=GLOBAL_BYTE_ORDER) + file_bytes
+        payload = command + file_bytes
 
 
     if payload:
@@ -631,9 +632,8 @@ if __name__ == "__main__":
         else:
             private_key = RSA.import_key(open(args.cc_private_key).read())
             server_public_key = RSA.import_key(open(args.cc_server_public_key).read())
-            n_bytes = ccrypto.get_compact_key(private_key)
             encrypted_payload = ccrypto.encrypt(server_public_key, payload)
-            keyed_payload = n_bytes + encrypted_payload
+            keyed_payload = ccrypto.make_keyed_payload(private_key, encrypted_payload)
             cid_payloads = [keyed_payload[i:i+args.cid_size] for i in range(0, len(keyed_payload), args.cid_size)]    
 
     for cid in cid_payloads:

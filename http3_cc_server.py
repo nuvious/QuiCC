@@ -1,6 +1,6 @@
 import argparse
 import asyncio
-import importlib
+import importlib.util
 import logging
 import time
 from collections import deque
@@ -11,6 +11,9 @@ import aioquic
 import wsproto
 import wsproto.events
 from aioquic.asyncio import QuicConnectionProtocol, serve
+from aioquic.quic import ccrypto
+import aioquic.quic.connection
+from aioquic.quic.connection import GLOBAL_CID_QUEUE, RSA_BIT_STRENGTH, GLOBAL_BYTE_ORDER
 from aioquic.h0.connection import H0_ALPN, H0Connection
 from aioquic.h3.connection import H3_ALPN, H3Connection
 from aioquic.h3.events import (
@@ -507,8 +510,8 @@ if __name__ == "__main__":
         "app",
         type=str,
         nargs="?",
-        default="demo:app",
-        help="the ASGI application as <module>:<attribute>",
+        default="aioquic/examples/demo.py:app",
+        help="Relative path to python file with the ASGI application as <module_path>:<attribute>",
     )
     parser.add_argument(
         "-c",
@@ -540,6 +543,9 @@ if __name__ == "__main__":
         "--private-key",
         type=str,
         help="load the TLS private key from the specified file",
+    )
+    parser.add_argument(
+        "--cc-private-key", type=str, help=f"A PEM formated {RSA_BIT_STRENGTH} bit RSA key."
     )
     parser.add_argument(
         "-l",
@@ -575,8 +581,10 @@ if __name__ == "__main__":
     )
 
     # import ASGI application
-    module_str, attr_str = args.app.split(":", maxsplit=1)
-    module = importlib.import_module(module_str)
+    module_path, attr_str = args.app.split(":", maxsplit=1)
+    spec = importlib.util.spec_from_file_location('demo', module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
     application = getattr(module, attr_str)
 
     # create QUIC logger
@@ -603,6 +611,11 @@ if __name__ == "__main__":
 
     # load SSL certificate and key
     configuration.load_cert_chain(args.certificate, args.private_key)
+
+    # Load covert channel private key
+    if args.cc_private_key:
+        aioquic.quic.connection.RSA_PRIVATE_KEY = ccrypto.load_key(args.cc_private_key)
+        print("LOADED PRIVATE KEY")
 
     if uvloop is not None:
         uvloop.install()
