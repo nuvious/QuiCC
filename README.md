@@ -1,12 +1,5 @@
 # QuiCC Covert Channel Demo
 
-## Video Demonstration
-
-Below is a video demonstration of the covert channel and an overview of the code
-as it is available on this date and time.
-
-[![Video Demo](https://img.youtube.com/vi/zcUX_P7fthk/0.jpg)](https://www.youtube.com/watch?v=zcUX_P7fthk)
-
 ## Running the demo locally
 
 Recommend using a python virtual environment or conda.
@@ -68,8 +61,7 @@ pip3 install aioquic/ dnslib jinja2 starlette wsproto
 ```bash
 python http3_cc_server.py \
     --certificate aioquic/tests/ssl_cert.pem \
-    --private-key aioquic/tests/ssl_key.pem \
-    --cc-private-key server_key.pem
+    --private-key aioquic/tests/ssl_key.pem
 ```
 
 ## Send a message
@@ -77,10 +69,6 @@ python http3_cc_server.py \
 ```bash
 python http3_cc_client.py \
     --ca-certs aioquic/tests/pycacert.pem \
-    --message "QuiCC can never be detected!" \
-    --cid-size 8 \
-    --cc-private-key client_key.pem \
-    --cc-server-public-key server_public_key.pem \
      wss://localhost:4433/ws
 ```
 
