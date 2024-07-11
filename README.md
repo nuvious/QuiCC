@@ -7,7 +7,9 @@ as it is available on this date and time.
 
 [![Watch the video](https://img.youtube.com/vi/zcUX_P7fthk/default.jpg)](https://youtu.be/nTQUwghvy5Q)
 
-## Quickstart
+## Running the demo locally
+
+Recommend using a python virtual environment or conda.
 
 ### Clone the repository and initialize submodules
 
@@ -99,3 +101,19 @@ python http3_cc_client.py \
 
 NOTE: If running the client and server on separate hosts, replace `localhost`
 with the DNS entry; in this example `quicc.local`.
+
+## Running the demo with docker-compose
+
+```bash
+docker-compose up
+```
+
+Expected output:
+
+```bash
+quicc_1   | 2024-07-11 03:59:37,717 INFO quic [6802ceaa04481025] Negotiated protocol version 0x00000001 (VERSION_1)
+quicc_1   | 2024-07-11 03:59:37,727 INFO quic [6802ceaa04481025] ALPN negotiated protocol h3
+quicc_1   | 2024-07-11 03:59:37,735 INFO quic RECEIVED DECRYPTED MESSAGE: b'QuiCC can never be detected!'
+quicc_1   | 2024-07-11 03:59:37,736 INFO quic [6802ceaa04481025] HTTP request CONNECT /ws
+quicc_1   | 2024-07-11 03:59:37,740 INFO quic [6802ceaa04481025] Connection close received (code 0x100, reason )
+```
