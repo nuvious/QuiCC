@@ -3,9 +3,9 @@
 ## Video Demonstration
 
 Below is a video demonstration of the covert channel and an overview of the code
-as it is available on this date and time.
+as it is available on this date and time.
 
-[![Watch the video](https://img.youtube.com/vi/zcUX_P7fthk/default.jpg)](https://youtu.be/nTQUwghvy5Q)
+https://youtu.be/zcUX_P7fthk
 
 ## Running the demo locally
 
