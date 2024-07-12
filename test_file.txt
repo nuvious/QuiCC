@@ -1,1 +1,1 @@
-QuiCC can never be detected! /s
+QuiCC can't be distinguished from benign traffic!

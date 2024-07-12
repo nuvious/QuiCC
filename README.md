@@ -96,7 +96,7 @@ logs:
 
 ### Send a file
 
-Typing a command `f:README.md` should result in the following output on the
+Typing a command `f:test_file.txt` should result in the following output on the
 server logs:
 
 ```bash
