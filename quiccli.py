@@ -60,20 +60,28 @@ class QuiCCli:
                 )
             )
 
-    def process_message(self, command, payload):
+    def process_message(self, command_input):
+        command = command_input[0]
+        payload = command_input[1:]
         peer_meta = PEER_META.get(self.host_ip)
         if command == 'm' or command == 'c':
-            count = queue_message(self.host_ip, (command + payload).encode('utf8'), peer_meta['cid_queue'], peer_meta['public_key'])
-            if self.is_client:
-                self.send_message(count)
+            if payload and payload[0] == ':':
+                count = queue_message(self.host_ip, (command + payload[1:]).encode('utf8'), peer_meta['cid_queue'], peer_meta['public_key'])
+                if self.is_client:
+                    self.send_message(count)
+            else:
+                return False
         elif command == 'f':
-            payload_bytes = open(payload, 'rb').read()
-            count = queue_message(self.host_ip, b'f' + payload_bytes, peer_meta['cid_queue'], peer_meta['public_key'])
-            if self.is_client:
-                self.send_message(count)
+            if payload and payload[0] == ':':
+                payload_bytes = open(payload[1:], 'rb').read()
+                count = queue_message(self.host_ip, b'f' + payload_bytes, peer_meta['cid_queue'], peer_meta['public_key'])
+                if self.is_client:
+                    self.send_message(count)
+            else:
+                return False
         elif command == 'k':
             payload = b'k'
-            count = queue_message(self.host_ip, (command + payload).encode('utf8'), peer_meta['cid_queue'], peer_meta['public_key'])
+            count = queue_message(self.host_ip, payload, peer_meta['cid_queue'], peer_meta['public_key'])
             if self.is_client:
                 self.send_message(count)
         else:
@@ -91,11 +99,7 @@ class QuiCCli:
         
         while True:
             command_input = input("Enter your command: ").strip().lower()
-            command_input.split(":")
-            if len(command_input) < 2:
-                if command_input == 'q':
-                    os._exit(0)
+            if len(command_input) >= 1:
+                self.process_message(command_input)
+            else:
                 print("Invalid format. Use [COMMAND_CHAR]:[HOST]:[PAYLOAD]")
-            command = command_input[0]
-            payload = ':'.join(command_input[1:]) # Allows support for : in commands
-            self.process_message(command, payload)

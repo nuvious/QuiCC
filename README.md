@@ -58,22 +58,52 @@ pip3 install aioquic/ dnslib jinja2 starlette wsproto
 
 ### Start the server
 
-```bash`
-python http3_cc_server.py \
-    --certificate aioquic/tests/ssl_cert.pem \
-    --private-key aioquic/tests/ssl_key.pem
+```bash
+python http3_cc_server.py --certificate aioquic/tests/ssl_cert.pem --private-key aioquic/tests/ssl_key.pem
 ```
 
-## Send a message
+## Start the client
 
 ```bash
-python http3_cc_client.py \
-    --ca-certs aioquic/tests/pycacert.pem \
-     wss://localhost:4433/ws
+python http3_cc_client.py --ca-certs aioquic/tests/pycacert.pem wss://localhost:4433/ws
 ```
 
 NOTE: If running the client and server on separate hosts, replace `localhost`
 with the DNS entry; in this example `quicc.local`.
+
+## Send commands
+
+On both the client and server you should be presented with this prompt:
+
+```bash
+Welcome to the QuiCC console.
+Enter 'm:[MESSAGE]' to send a message.
+Enter 'c:[COMMAND]' to send a remote command.
+Enter 'f:[FILE]' to send a file.
+Enter 'k' to send a keepalive message to recieve responses.
+Enter 'q' to quit.
+Enter your command:
+```
+
+### Send a message
+
+Typing a command `m:hi` should produce the following output on the server
+logs:
+
+```bash
+2024-07-12 01:06:01,587 INFO quic RECEIVED MESSAGE: b'hi'
+```
+
+### Send a file
+
+Typing a command `f:README.md` should result in the following output on the
+server logs:
+
+```bash
+RECEIVED FILE SAVED TO: ::ffff:127.0.0.1-message-1.bin
+```
+
+The `::ffff:127.0.0.1-message-1.bin` should hold the contents of test_file.txt
 
 ### Send a file
 
@@ -90,18 +120,20 @@ python http3_cc_client.py \
 NOTE: If running the client and server on separate hosts, replace `localhost`
 with the DNS entry; in this example `quicc.local`.
 
-## Running the demo with docker-compose
+### Send a remote command
+
+Typing a command `c:whoami` should result in the following output on the
+server logs:
 
 ```bash
-docker-compose up
+2024-07-12 01:11:09,287 INFO quic RECEIVED COMMAND: b'whoami'
 ```
 
-Expected output:
+At this point stdout and stderr will be queued to be sent back but we need
+to send requests to get CIDs sto decrypt the output. To do this simply use
+the command `k` and a keep-alive message will be sent and the result of
+the command should appear in the client logs:
 
 ```bash
-quicc_1   | 2024-07-11 03:59:37,717 INFO quic [6802ceaa04481025] Negotiated protocol version 0x00000001 (VERSION_1)
-quicc_1   | 2024-07-11 03:59:37,727 INFO quic [6802ceaa04481025] ALPN negotiated protocol h3
-quicc_1   | 2024-07-11 03:59:37,735 INFO quic RECEIVED DECRYPTED MESSAGE: b'QuiCC can never be detected!'
-quicc_1   | 2024-07-11 03:59:37,736 INFO quic [6802ceaa04481025] HTTP request CONNECT /ws
-quicc_1   | 2024-07-11 03:59:37,740 INFO quic [6802ceaa04481025] Connection close received (code 0x100, reason )
+2024-07-12 01:12:44,387 INFO quic RECEIVED MESSAGE: b':nuvious\n\n\n0'
 ```
