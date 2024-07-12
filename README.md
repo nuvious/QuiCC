@@ -58,7 +58,7 @@ pip3 install aioquic/ dnslib jinja2 starlette wsproto
 
 ### Start the server
 
-```bash
+```bash`
 python http3_cc_server.py \
     --certificate aioquic/tests/ssl_cert.pem \
     --private-key aioquic/tests/ssl_key.pem

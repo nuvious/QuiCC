@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import importlib.util
 import logging
+import threading
 import time
 from collections import deque
 from email.utils import formatdate
@@ -13,7 +14,6 @@ import wsproto.events
 from aioquic.asyncio import QuicConnectionProtocol, serve
 from aioquic.quic import ccrypto
 import aioquic.quic.connection
-from aioquic.quic.connection import GLOBAL_CID_QUEUE, RSA_BIT_STRENGTH, GLOBAL_BYTE_ORDER
 from aioquic.h0.connection import H0_ALPN, H0Connection
 from aioquic.h3.connection import H3_ALPN, H3Connection
 from aioquic.h3.events import (
@@ -28,6 +28,9 @@ from aioquic.quic.configuration import QuicConfiguration
 from aioquic.quic.events import DatagramFrameReceived, ProtocolNegotiated, QuicEvent
 from aioquic.quic.logger import QuicFileLogger
 from aioquic.tls import SessionTicket
+
+import quiccli
+import aioquic.quic.ccrypto
 
 try:
     import uvloop
@@ -545,9 +548,6 @@ if __name__ == "__main__":
         help="load the TLS private key from the specified file",
     )
     parser.add_argument(
-        "--cc-private-key", type=str, help=f"A PEM formated {RSA_BIT_STRENGTH} bit RSA key."
-    )
-    parser.add_argument(
         "-l",
         "--secrets-log",
         type=str,
@@ -612,15 +612,10 @@ if __name__ == "__main__":
     # load SSL certificate and key
     configuration.load_cert_chain(args.certificate, args.private_key)
 
-    # Load covert channel private key
-    if args.cc_private_key:
-        aioquic.quic.connection.RSA_PRIVATE_KEY = ccrypto.load_key(args.cc_private_key)
-        print("LOADED PRIVATE KEY")
-
     if uvloop is not None:
         uvloop.install()
 
-    try:
+    def _run_server():
         asyncio.run(
             main(
                 host=args.host,
@@ -630,5 +625,10 @@ if __name__ == "__main__":
                 retry=args.retry,
             )
         )
-    except KeyboardInterrupt:
-        pass
+    threading.Thread(target=_run_server).start()
+    
+        
+    cli = quiccli.QuiCCli(
+        is_client = False
+    )
+    cli.run_cli()
