@@ -13,6 +13,10 @@ entropy header fields. In this implementation the connection id field is
 specifically targeted with future work to utilize other high-entropy header
 fields.
 
+## Video Demonstration
+
+[![QuiCC - A covert channel based on the quic protocol.](https://img.youtube.com/vi/5oHfefoECCE/0.jpg)](https://www.youtube.com/watch?v=5oHfefoECCE)
+
 ## Running the demo locally
 
 Recommend using a python virtual environment, conda or a container environment.
