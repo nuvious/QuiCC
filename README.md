@@ -1,8 +1,26 @@
 # QuiCC Covert Channel Demo
 
+## Overview
+
+Covert channels are means of transmitting information in a clandestine way that
+are not observable by a passive warden and are resistant to intercept or
+disruption by an active warden.
+
+This covert channel is implemented using the quic protocol defined by
+[RFC 9000](https://datatracker.ietf.org/doc/html/rfc9000) and
+[RFC 9369](https://datatracker.ietf.org/doc/html/rfc9369/) by exploiting high
+entropy header fields. In this implementation the connection id field is
+specifically targeted with future work to utilize other high-entropy header
+fields.
+
 ## Running the demo locally
 
-Recommend using a python virtual environment or conda.
+Recommend using a python virtual environment, conda or a container environment.
+A docker-compose is provided by at the time of writing needs revision after a
+breaking change. See version
+[0.0.1](https://github.com/nuvious/QuiCC/releases/tag/0.0.1) for the initial POC
+in which the docker-compose was authored if you're wanting to use docker to see
+the technique in action.
 
 ### Clone the repository and initialize submodules
 
@@ -137,3 +155,12 @@ the command should appear in the client logs:
 ```bash
 2024-07-12 01:12:44,387 INFO quic RECEIVED MESSAGE: b':nuvious\n\n\n0'
 ```
+
+## Known Issues
+
+Known issues for this implementation of the covert channel are documented in
+the Github Issues section of this repository. If you find a vulnerability in
+this project related to intercept, disruption or denial of service that may
+be mitigated, feel free to open up an issue and/or contribute to the project.
+
+
