@@ -49,7 +49,7 @@ pip3 install aioquic/ dnslib jinja2 starlette wsproto
 python http3_cc_server.py --certificate aioquic/tests/ssl_cert.pem --private-key aioquic/tests/ssl_key.pem
 ```
 
-## Start the client
+### Start the client
 
 ```bash
 python http3_cc_client.py --ca-certs aioquic/tests/pycacert.pem wss://localhost:4433/ws
@@ -58,7 +58,7 @@ python http3_cc_client.py --ca-certs aioquic/tests/pycacert.pem wss://localhost:
 NOTE: If running the client and server on separate hosts, replace `localhost`
 with the DNS entry; in this example `quicc.local`.
 
-## Send commands
+### Send commands
 
 On both the client and server you should be presented with this prompt:
 
