@@ -84,6 +84,10 @@ A path challenge frame can be sent by a client to check if a path is reachable.
 The Data field of a path challenge frame is required to have 64 bits of entropy
 to make it difficult to guess [2, Section 19.17].
 
+### Stateless Reset Token
+
+TODO
+
 ## Existing Implementations
 
 A review of literature and media at the time of writing did not show any
