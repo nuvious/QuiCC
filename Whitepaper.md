@@ -1,4 +1,10 @@
-# On Covert Channels using Quic Protocol Headers
+---
+title: "On Covert Channels using Quic Protocol Headers"
+author: "David Cheeseman"
+email: dcheese1@jh.edu / david@cheeseman.club
+subtitle: "Implementing a covert channel in high-entropy fields of the QUIC protocol"
+date: 7/15/2024
+---
 
 In this paper a covert channel exploiting headers in the QUIC protocol is
 described and demonstrated. Many header values are randomly chosen and are
@@ -12,7 +18,7 @@ indistinguishable from random high entropy values. An implementation of this
 covert channel was constructed and demonstrated. Detection and disruption
 vectors are also enumerated.
 
-## Introduction
+# Introduction
 
 The Quick UDP Internet Connections (QUIC) protocol was proposed by J. Roskind
 as an alternative to TCP. The goals of the protocol were to make an alternative
@@ -34,7 +40,7 @@ mechanisms for error correction and congestion control, ensuring reliable and
 efficient data transfer even in less stable network conditions such as mobile
 device connections.
 
-## Motivations
+# Motivations
 
 While QUIC protocol connections are often protected with TLS 1.3 [4] some
 nation states block foundational features of TLS 1.3 such as ESNI [7].
@@ -55,14 +61,14 @@ or active warden. To do this we need to hide communications in fields which
 a passive warden would not be able to distinguish from benign traffic and
 in a way where manipulation of the passed messages is not possible.
 
-## Overview
+# Overview
 
 The QUIC protocol is defined in RFC 9000 [2], RFC 8999 [3], RFC 9001 [4], RFC 
 9002 [5], and QUIC v2 extends these specifications in RFC 9369[6]. In particular
 RFC 9000 defines the base protocol which provides us a reference to what fields
 in protocol headers may be useful for a covert channel.
 
-### Connection ID
+## Connection ID
 
 Each connection in the QUIC protocol has a unique connection ID to ensure
 connections can be correlated even if there are changes in lower protocols such
@@ -71,24 +77,20 @@ by their connection IDs [2, Section 5.1] and, in the context of address
 validation, that connection IDs must have at least 64 bits of entropy
 [2, Section 8.1].
 
-### Address Validation Token 
+## Address Validation Token 
 
 Address validation tokens are an optional field that can be provided by a server
 and used in validating subsequent connections [2, Section 8.1.3]. An address
 validation token is required to have 128 bits of entropy to make it difficult
 to guess.
 
-### Path Challenge Frames
+## Path Challenge Frames
 
 A path challenge frame can be sent by a client to check if a path is reachable.
 The Data field of a path challenge frame is required to have 64 bits of entropy
 to make it difficult to guess [2, Section 19.17].
 
-### Stateless Reset Token
-
-TODO
-
-## Existing Implementations
+# Existing Implementations
 
 A review of literature and media at the time of writing did not show any
 existing QUIC based covert channel implementations. Use of QUIC as a covert
@@ -98,7 +100,7 @@ Specifically the use of SMB over QUIC was proposed by Zdrnja as a covert channel
 on port 443 stood up by a malicious actor to exploit the legitimate use of port
 443 for HTTP/3 connections [10].
 
-## Implementation
+# Implementation
 
 Of the available high-entropy fields, the connection ID is the only one
 explicitly required. We can meet the high-entropy requirements of the connection
@@ -124,13 +126,13 @@ ways that have issues enumerated to fully implement the proposed design. More
 information can be found at the source repository for the implementation in 
 reference [13].
 
-### Base Implementation
+## Base Implementation
 
 The implemented covert channel uses the aioquic python library by Jeremy
 Lainé [12]. This library implements a QUIC based HTTP server and client which
 provided a foundational base to build the proposed covert channel.
 
-### Encryption Algorithms
+## Encryption Algorithms
 
 In this implementation RSA [11] was selected based on its ubiquity in
 public/private key encryption. Block encryption was conducted using PKCS1_OAEP
@@ -145,7 +147,7 @@ itself, it can be used in connection IDs and satisfy the entropy requirements,
 making it indistinguishable from benign traffic making it harder to detect
 the covert channel.
 
-### Payload Construction
+## Payload Construction
 
 In this implementation 4 commands were established for use and are described
 in the table below:
@@ -168,9 +170,9 @@ with the encrypted AES key $E_{aes}$ and the random $IV$:
 
 $$ P = (IV , E_{aes} , C)$$
 
-### Key Exchange
+## Key Exchange
 
-#### Out of Bound Key Distribution
+### Out of Bound Key Distribution
 
 In out of bound key distribution, the client obtains the server's covert channel
 public key (which is different from the server's TLS key) by other means. The
@@ -180,7 +182,7 @@ server then responds with a keep alive message to confirm receipt of the
 public key which upon successful decryption by the client validates the server
 has received their key.
 
-#### Cover Channel Key Exchange
+### Cover Channel Key Exchange
 
 If an out of bound key cannot be exchanged, the covert channel can be used to
 distribute public keys in the connection IDs. In this key exchange the client
@@ -212,7 +214,7 @@ covert communications and executing a MITM attack attempt on each connection
 which would incur significant resource expenditure to implement and slow or
 disrupt communications generally.
 
-### Covert Channel Operation
+## Covert Channel Operation
 
 After key exchange has been completed, the client can construct payloads and
 send them to the server. In the absence of any commands that require a response,
@@ -224,7 +226,7 @@ payload has not been transmitted and the client or server will then continue
 to receive connection IDs and host IDs until a successful decryption is
 achieved.
 
-## Bandwidth Calculation
+# Bandwidth Calculation
 
 In the current implementation, each connection ID can encode 8 bytes of
 encrypted data per connection. However, RFC 9000 only specifies that the
@@ -269,6 +271,13 @@ then combine it with the previous function to get final bandwidth:
 
 $$ BW = {C_{r}L_{cid}M_{c} \over {B_{rsa} \over 8} + B_{iv} + R_{c}M_{c}} $$
 
+|Variable|Description|Variable|Description|
+|-|-|-|-|
+|$BW$|Effective Bandwidth|$B_{iv}$|Size of IV|
+|$C_{r}$|Connections/sec|$B_{rsa}$|RSA bit strength|
+|$L_{cid}$|CID Size in Bytes|$R_{c}$|Compression Ratio [0,1]|
+|$M_{c}$|Uncompressed Message Size|
+
 If we fix the AES IV size to 16 bytes, assume a compression ratio of 1
 (uncompressed) and the bit-strength of RSA to 4096 we can plot a 3d graph of
 the relationship between connection rate and the real bandwidth of the covert
@@ -280,15 +289,15 @@ In the plot we can see that as the message size grows the overhead from $IV$ and
 $B_{rsa}$ is diminished. Additionally we can see the dominant affect connection
 rate can have on the covert channel's overall bandwidth.
 
-## Limitations
+# Limitations
 
-### Synchronization Disruption
+## Synchronization Disruption
 
 An active warden could swap out any connection ID during the use of the covert
 channel to break the encryption sync between the client and server. Future work
 is needed to determine a synchronization protocol to mitigate against this risk.
 
-### Sinlge Connection
+## Sinlge Connection
 
 The current implementation also depends on having only one connection opened
 between the client and server at a time. This may be a reasonable limitation
@@ -296,9 +305,9 @@ since the goal of QUIC is to reduce the number of connections to a single
 connection between a client and server and leverage multiplexing to allow
 access to multiple resources over a single connection.
 
-## Detection and Mitigation
+# Detection and Mitigation
 
-### Statistical Analysis of Odd Numbered Connection IDs
+## Statistical Analysis of Odd Numbered Connection IDs
 
 Specific to key exchange done in-band, because the N modulus will be an odd
 number, statistical analysis of the first 128, 256, 384, and 512 bytes for
@@ -308,11 +317,17 @@ to a passive warden that this covert channel technique is being used.
 
 This detection risk is not applicable to OOB key distribution.
 
-## Conclusion
+# Conclusion
 
-TODO
+In conclusion the connection ID  presents a viable vector for use as a covert channel.
+Its high entropy nature makes it ideal for sending encrypted payloads including the
+public modulus of RSA public keys if out of band key distribution is not possible.
+This provides a channel for use when conventional means of encrypting data is compromised
+by techniques such as TLS inspection. Even if a passive warden can see the connection
+IDs being exchanged the use of high-entropy encrypted paylods for CIDs will make the
+covert channel traffic indistinguishable from benign traffic.
 
-## References
+# References
 
 [1] J. Roskind, “QUIC: Design Document and Specification Rationale,” GoogleDocs,
 Apr. 2012. Available:

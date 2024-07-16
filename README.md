@@ -31,7 +31,8 @@ the technique in action.
 ```bash
 git clone --recurse-submodules https://github.com/nuvious/QuiCC.git
 cd QuiCC
-```
+```
+
 
 ### Install Requirements
 
@@ -40,6 +41,7 @@ requirements are not included in the package dependencies so we have to install
 them manually.
 
 ```bash
+sudo apt install build-essential libssl-dev python3-dev
 pip3 install aioquic/ dnslib jinja2 starlette wsproto
 ```
 
