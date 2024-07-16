@@ -2,9 +2,14 @@
 .venv
 venv
 __pycache__
+*-checkpoint.ipynb
 
 # Key files
 *.pem
 
 # Bin dumps used for initial dev/debugging
 *.bin
+
+# pandoc built files
+*.pdf
+*.docx
