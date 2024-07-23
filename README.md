@@ -94,21 +94,6 @@ RECEIVED FILE SAVED TO: ::ffff:127.0.0.1-message-1.bin
 
 The `::ffff:127.0.0.1-message-1.bin` should hold the contents of test_file.txt
 
-### Send a file
-
-```bash
-python http3_cc_client.py \
-    --ca-certs aioquic/tests/pycacert.pem \
-    --file README.md \
-    --cid-size 8 \
-    --cc-private-key client_key.pem \
-    --cc-server-public-key server_public_key.pem \
-    wss://localhost:4433/ws
-```
-
-NOTE: If running the client and server on separate hosts, replace `localhost`
-with the DNS entry; in this example `quicc.local`.
-
 ### Send a remote command
 
 Typing a command `c:whoami` should result in the following output on the
