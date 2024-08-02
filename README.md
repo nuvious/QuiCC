@@ -17,6 +17,10 @@ fields.
 
 [![QuiCC - A covert channel based on the quic protocol.](https://img.youtube.com/vi/5oHfefoECCE/0.jpg)](https://www.youtube.com/watch?v=5oHfefoECCE)
 
+NOTE: In the above demo the RSA bit strength is set to 1024. This was done only
+to speed up implementation and debugging execution during development of the
+project. The implementation at time of writing [defaults to 4096 bit RSA](https://github.com/nuvious/aioquic/blob/fe7c293e1822babcc7fcafbb7658e145d9cc02dd/src/aioquic/quic/connection.py#L118).
+
 ## Running the demo locally
 
 Recommend using a python virtual environment, conda or a container environment.
