@@ -1,4 +1,10 @@
-
+---
+title: "On Covert Channels using Quic Protocol Headers"
+author: "David Cheeseman"
+email: dcheese1@jh.edu / david@cheeseman.club
+subtitle: "Implementing a covert channel in high-entropy fields of the QUIC protocol"
+date: 7/15/2024
+---
 
 In this paper a covert channel exploiting headers in the QUIC protocol is
 described and demonstrated. Many header values are randomly chosen and are
@@ -53,7 +59,8 @@ verifying the trustworthy nature of certificates used to negotiate and encrypted
 connection. We must assume all packets are visible in clear text to a passive
 or active warden. To do this we need to hide communications in fields which
 a passive warden would not be able to distinguish from benign traffic and
-in a way where manipulation of the passed messages is not possible.
+in a way where manipulation by an active warden would cause disruptions to
+legitimate traffic to an unacceptable degree.
 
 # Overview
 
@@ -84,7 +91,7 @@ A path challenge frame can be sent by a client to check if a path is reachable.
 The Data field of a path challenge frame is required to have 64 bits of entropy
 to make it difficult to guess [2, Section 19.17].
 
-# Existing Implementations
+# Related Work
 
 A review of literature and media at the time of writing did not show any
 existing QUIC based covert channel implementations. Use of QUIC as a covert
@@ -113,12 +120,6 @@ encrypted and connection IDs are replaced with chunks of the encrypted payloads.
 Several connections are then made to transfer the chunks of the encrypted
 payloads which are saved by the recipient in a buffer indexed by the sender's
 address until a successful decryption is achieved.
-
-NOTE: This paper outlines the design of the final covert channel but not all
-design aspects are implemented at the time of writing or are implemented in
-ways that have issues enumerated to fully implement the proposed design. More
-information can be found at the source repository for the implementation in 
-reference [13].
 
 ## Base Implementation
 
@@ -168,7 +169,7 @@ $$ P = (IV , E_{aes} , C)$$
 
 ### Out of Bound Key Distribution
 
-In out of bound key distribution, the client obtains the server's covert channel
+In OOB key distribution, the client obtains the server's covert channel
 public key (which is different from the server's TLS key) by other means. The
 client then loads the public key upon starting of the covert channel tool and
 can send a copy of their public key encrypted by the server's public key. The
