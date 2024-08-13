@@ -1,10 +1,4 @@
----
-title: "On Covert Channels using Quic Protocol Headers"
-author: "David Cheeseman"
-email: dcheese1@jh.edu / david@cheeseman.club
-subtitle: "Implementing a covert channel in high-entropy fields of the QUIC protocol"
-date: 7/15/2024
----
+
 
 In this paper a covert channel exploiting headers in the QUIC protocol is
 described and demonstrated. Many header values are randomly chosen and are
@@ -96,7 +90,7 @@ A review of literature and media at the time of writing did not show any
 existing QUIC based covert channel implementations. Use of QUIC as a covert
 channel has been proposed before, though in the context of enabling QUIC
 services as a covert channel operating on ports that have alternative uses.
-Specifically the use of SMB over QUIC was proposed by Zdrnja as a covert channel
+Specifically, the use of SMB over QUIC was proposed by Zdrnja as a covert channel
 on port 443 stood up by a malicious actor to exploit the legitimate use of port
 443 for HTTP/3 connections [10].
 
@@ -110,7 +104,7 @@ Keys for encryption are ideally provided out of band (OOB) which would allow
 for all data transmitted to meet the entropy requirements and would prevent a
 man in the middle (MITM) attack.
 
-Without an OOB distributed key a key exchange mechanism is proposed where only
+Without an OOB distributed key a key exchange mechanism is proposed, where only
 high-entropy parameters to the encryption scheme are exchanged, and low-entropy
 values are agreed upon ahead of time by the client and server.
 
@@ -212,7 +206,7 @@ modulus and encrypted keep alive messages making them indistinguishable from
 benign traffic, requiring an active warden to treat all connections as potential
 covert communications and executing a MITM attack attempt on each connection
 which would incur significant resource expenditure to implement and slow or
-disrupt communications generally.
+disrupt communications.
 
 ## Covert Channel Operation
 
@@ -259,10 +253,10 @@ $$ BW_{raw} = C_{r}L_{cid} $$
 
 That only describes the bandwidth of encrypted payloads, however. For each
 payload there is overhead provided by the initialization vector, the encrypted
-AES key which is either 128, 256, 384, and 512 bytes for 1024-, 2048-, 3072-,
+AES key, which is either 128, 256, 384, and 512 bytes for 1024-, 2048-, 3072-,
 and 4096-bit RSA respectively, plus the compressed encrypted payload length. The
 larger the payload the less overhead this represents, but it does represent
-a geometric reduction of the total bandwidth. To quantify this we can determine
+a geometric reduction of the total bandwidth. To quantify this, we can determine
 the fraction of data in the total payloads that is the encrypted message by
 defining $B_{rsa}$ as the bit-strength of the RSA key, $B_{iv}$ for
 the size of the IV, and $M_{l}$ as the size of the message and
@@ -286,7 +280,7 @@ channel in Figure 1.
 ![Fig 1](assets/bw_plot.png)
 
 In the plot we can see that as the message size grows the overhead from $IV$ and
-$B_{rsa}$ is diminished. Additionally we can see the dominant affect connection
+$B_{rsa}$ is diminished. Additionally, we can see the dominant affect connection
 rate can have on the covert channel's overall bandwidth.
 
 # Limitations
@@ -297,7 +291,7 @@ An active warden could swap out any connection ID during the use of the covert
 channel to break the encryption sync between the client and server. Future work
 is needed to determine a synchronization protocol to mitigate against this risk.
 
-## Sinlge Connection
+## Single Connection
 
 The current implementation also depends on having only one connection opened
 between the client and server at a time. This may be a reasonable limitation
@@ -309,7 +303,7 @@ access to multiple resources over a single connection.
 
 ## Statistical Analysis of Odd Numbered Connection IDs
 
-Specific to key exchange done in-band, because the N modulus will be an odd
+Specific to key exchange done in-band because the N modulus will be an odd
 number, statistical analysis of the first 128, 256, 384, and 512 bytes for
 1024-, 2048-, 3072-, and 4096-bit RSA respectively will show a statistically
 significant increase in the prevalence of odd numbers. This would then signal
@@ -319,12 +313,12 @@ This detection risk is not applicable to OOB key distribution.
 
 # Conclusion
 
-In conclusion the connection ID  presents a viable vector for use as a covert channel.
+In conclusion the connection ID presents a viable vector for use as a covert channel.
 Its high entropy nature makes it ideal for sending encrypted payloads including the
 public modulus of RSA public keys if out of band key distribution is not possible.
 This provides a channel for use when conventional means of encrypting data is compromised
 by techniques such as TLS inspection. Even if a passive warden can see the connection
-IDs being exchanged the use of high-entropy encrypted paylods for CIDs will make the
+IDs being exchanged the use of high entropy encrypted payloads for CIDs will make the
 covert channel traffic indistinguishable from benign traffic.
 
 # References

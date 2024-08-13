@@ -12,4 +12,5 @@ __pycache__
 
 # pandoc built files
 *.pdf
+!Whitepaper.pdf
 *.docx
