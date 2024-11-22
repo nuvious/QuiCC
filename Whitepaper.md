@@ -177,7 +177,7 @@ server then responds with a keep alive message to confirm receipt of the
 public key which upon successful decryption by the client validates the server
 has received their key.
 
-### Cover Channel Key Exchange
+### Covert Channel Key Exchange
 
 If an out of bound key cannot be exchanged, the covert channel can be used to
 distribute public keys in the connection IDs. In this key exchange the client
