@@ -144,5 +144,3 @@ Known issues for this implementation of the covert channel are documented in
 the Github Issues section of this repository. If you find a vulnerability in
 this project related to intercept, disruption or denial of service that may
 be mitigated, feel free to open up an issue and/or contribute to the project.
-
-

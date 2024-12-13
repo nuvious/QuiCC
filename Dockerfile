@@ -8,8 +8,9 @@ SHELL ["/bin/bash", "-c"]
 
 COPY . .
 
-RUN openssl genpkey -algorithm RSA -out server_key.pem -pkeyopt rsa_keygen_bits:4096 && \
-    openssl genpkey -algorithm RSA -out client_key.pem -pkeyopt rsa_keygen_bits:4096 && \
+# 1024 bit key is only for demonstration purposes
+RUN openssl genpkey -algorithm RSA -out server_key.pem -pkeyopt rsa_keygen_bits:1024 && \
+    openssl genpkey -algorithm RSA -out client_key.pem -pkeyopt rsa_keygen_bits:1024 && \
     openssl rsa -in client_key.pem -pubout -out client_public_key.pem && \
     openssl rsa -in server_key.pem -pubout -out server_public_key.pem && \
     openssl genrsa -out ca-key.pem 4096 && \
@@ -22,3 +23,4 @@ RUN openssl genpkey -algorithm RSA -out server_key.pem -pkeyopt rsa_keygen_bits:
     pip3 install aioquic/ dnslib jinja2 starlette wsproto
 
   SHELL [ "/bin/sh" ]
+  
