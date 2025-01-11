@@ -1,0 +1,56 @@
+Title of Presentation
+
+On Covert Channels Using QUIC Protocol Headers
+
+Presenter(s) Name
+
+David Cheeseman
+
+Abstract
+
+This presentation explores a covert communication channel leveraging high-entropy fields in the QUIC protocol headers. With fields like connection IDs and address validation tokens, QUIC provides an ideal platform for creating channels that evade detection while conforming to protocol entropy requirements. By implementing encryption techniques and leveraging the aioquic library, this work demonstrates covert communication feasibility and discusses potential detection and mitigation strategies. This research provides critical insights into protocol exploitation by leveraging high entropy fields.
+
+Bio
+
+I am a US Navy Veteran and cybersecurity professional with experience ranging from AI startups, government contractors, and fortune 50 companies where I’m currently employed. As a US Navy Veteran I served as a Submarine Officer and Information Professional officer working with nuclear reactors, radio, cryptography and networking. On the blue team side I managed cybersecurity for 2 startups, one of which was a government contractor, and later worked in a fortune 50 helping to maintain services which scanned 900k+ assets internally. On the red team side I study Cybersecurity at Johns Hopkins University with a focus on Red Team subjects and participate in CTF competitions where I’ve made podium placements in small teams and solo competitions.
+
+Detailed Description
+
+The presentation delves into the implementation of a covert channel in the QUIC protocol, specifically exploiting high-entropy fields such as connection IDs and address validation tokens. It begins with an overview of QUIC's protocol design, its reliance on UDP, and its encryption features. Using the aioquic library, the covert channel was developed to meet entropy requirements via encryption and careful payload construction. A discussion of the implemented RSA and AES encryption strategies follows, including an explanation of the key exchange mechanisms used to maintain secure communications.
+
+Bandwidth considerations, synchronization challenges, and the limitations of single-connection operations are addressed, emphasizing the impact on channel efficiency. Additionally, detection risks, such as statistical analysis of key exchange data, are analyzed. The presentation concludes with mitigation techniques and the potential for larger connection IDs to enhance bandwidth. The talk balances technical depth with practical considerations, providing value to a diverse audience of security practitioners and researchers.
+
+Track/Length Preference
+
+Primary: BUILD IT
+
+This will give me time to discuss and demonstrate my covert channel implementation while also having ample time for questions and discussions.
+
+Secondary: FAST AND FURIOUS (example of 10 minute presentation in references)
+
+This project was created in the context of a Covert Channels course at Johns Hopkins University and was restricted to 10 minute presentation windows. I can easily facilitate the same and have little to no public speaking fear to slow me down.
+
+Why do you feel this submission is a good fit for ShmooCon?
+
+This presentation addresses a critical cybersecurity topic by blending theoretical concepts with practical implementation. By its nature, this covert channel also demonstrates how one can take a protocol specification and derive covert channels by searching for high entropy fields to embed encrypted data that make detection a substantial effort. It showcases innovative techniques while providing the template for which those techniques were created, aligning with ShmooCon’s focus on cutting-edge security research and spreading knowledge to the broader cybersecurity community.
+
+List of other conferences at which submission has been presented or submitted.
+
+None.
+
+Are you a potential first-time presenter at ShmooCon? Have you spoken at any other conferences? If yes, which ones?
+
+Yes, this would be my first time presenting at ShmooCon. I’m really excited about taking one of my theory-to-practice demos and showing the challenges of detecting and stopping data exfiltration.
+
+List of facilities requested beyond what is already provided (power, projector with HDMI input, sound projection, and internet connectivity).
+
+None required.
+
+References:
+
+- Demo Video  (10 min)
+  - https://www.youtube.com/watch?v=5oHfefoECCE
+- White Paper
+  - https://github.com/nuvious/QuiCC/blob/main/Whitepaper.pdf
+- Implementation Code
+  - https://github.com/nuvious/QuiCC

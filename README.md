@@ -52,13 +52,17 @@ pip3 install aioquic/ dnslib jinja2 starlette wsproto
 ### Start the server
 
 ```bash
-python http3_cc_server.py --certificate aioquic/tests/ssl_cert.pem --private-key aioquic/tests/ssl_key.pem
+python3 http3_cc_server.py \
+  --certificate aioquic/tests/ssl_cert.pem \
+  --private-key aioquic/tests/ssl_key.pem
 ```
 
 ### Start the client
 
 ```bash
-python http3_cc_client.py --ca-certs aioquic/tests/pycacert.pem wss://localhost:4433/ws
+python3 http3_cc_client.py \
+  --ca-certs aioquic/tests/pycacert.pem \
+  wss://localhost:4433/ws
 ```
 
 NOTE: If running the client and server on separate hosts, replace `localhost`
@@ -144,5 +148,3 @@ Known issues for this implementation of the covert channel are documented in
 the Github Issues section of this repository. If you find a vulnerability in
 this project related to intercept, disruption or denial of service that may
 be mitigated, feel free to open up an issue and/or contribute to the project.
-
-
