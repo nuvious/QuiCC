@@ -1,4 +1,6 @@
 import asyncio
+import json
+import logging
 import os
 import re
 import socket
@@ -6,6 +8,10 @@ import socket
 from aioquic.quic.connection import RSA_BIT_STRENGTH, PEER_META, PEER_META_LOCK, resolve_hostname_from_url, create_peer_meta
 from aioquic.quic.ccrypto import queue_message, get_compact_key
 
+logger = logging.getLogger(__name__)
+
+def json_serializer(obj):
+    return str(obj)
 
 class QuiCCli:
     def __init__(self,
@@ -31,6 +37,8 @@ class QuiCCli:
         if self.is_client:
             self.host, self.host_ip = resolve_hostname_from_url(self.urls[0])
             if self.host == 'localhost' or self.host_ip == "127.0.0.1":
+                self.host_ip = "::1"
+            else:
                 self.host_ip = "::ffff:" + self.host_ip
             PEER_META_LOCK.acquire(timeout=5)
             peer_meta = create_peer_meta()
@@ -63,29 +71,36 @@ class QuiCCli:
     def process_message(self, command_input):
         command = command_input[0]
         payload = command_input[1:]
-        peer_meta = PEER_META.get(self.host_ip)
-        if command == 'm' or command == 'c':
-            if payload and payload[0] == ':':
-                count = queue_message(self.host_ip, (command + payload[1:]).encode('utf8'), peer_meta['cid_queue'], peer_meta['public_key'])
+        if self.is_client:
+            peer_meta = PEER_META.get(self.host_ip)
+        try:
+            if command == 'm' or command == 'c':
+                if payload and payload[0] == ':':
+                    count = queue_message(self.host_ip, (command + payload[1:]).encode('utf8'), peer_meta['cid_queue'], peer_meta['public_key'])
+                    if self.is_client:
+                        self.send_message(count)
+                else:
+                    return False
+            elif command == 'f':
+                if payload and payload[0] == ':':
+                    payload_bytes = open(payload[1:], 'rb').read()
+                    count = queue_message(self.host_ip, b'f' + payload_bytes, peer_meta['cid_queue'], peer_meta['public_key'])
+                    if self.is_client:
+                        self.send_message(count)
+                else:
+                    return False
+            elif command == 'k':
+                payload = b'k'
+                count = queue_message(self.host_ip, payload, peer_meta['cid_queue'], peer_meta['public_key'])
                 if self.is_client:
                     self.send_message(count)
+            elif command == 'q':
+                os._exit(0)
             else:
-                return False
-        elif command == 'f':
-            if payload and payload[0] == ':':
-                payload_bytes = open(payload[1:], 'rb').read()
-                count = queue_message(self.host_ip, b'f' + payload_bytes, peer_meta['cid_queue'], peer_meta['public_key'])
-                if self.is_client:
-                    self.send_message(count)
-            else:
-                return False
-        elif command == 'k':
-            payload = b'k'
-            count = queue_message(self.host_ip, payload, peer_meta['cid_queue'], peer_meta['public_key'])
-            if self.is_client:
-                self.send_message(count)
-        else:
-            print(f"Unknown command '{command}'. Enter 'm', 'c', 'f', or 'q'.")
+                print(f"Unknown command '{command}'. Enter 'm', 'c', 'f', or 'q'.")
+        except ValueError as e:
+            logger.warning("Error queuing message for ip %s", self.host_ip)
+            logger.warning("Peer meta dump:\n%s", json.dumps(PEER_META, default=json_serializer, indent=True))
         return True
 
 

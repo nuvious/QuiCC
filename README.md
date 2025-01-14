@@ -27,14 +27,37 @@ NOTE: In the above demo the RSA bit strength is set to 1024. This was done only
 to speed up implementation and debugging execution during development of the
 project. The implementation at time of writing [defaults to 4096 bit RSA](https://github.com/nuvious/aioquic/blob/fe7c293e1822babcc7fcafbb7658e145d9cc02dd/src/aioquic/quic/connection.py#L118).
 
-## Running the demo locally
+## Running in Docker
 
-Recommend using a python virtual environment, conda or a container environment.
-A docker-compose is provided by at the time of writing needs revision after a
-breaking change. See version
-[0.0.1](https://github.com/nuvious/QuiCC/releases/tag/0.0.1) for the initial POC
-in which the docker-compose was authored if you're wanting to use docker to see
-the technique in action.
+First build the container:
+
+```bash
+sudo docker build -t quicc .
+```
+
+Next create a network:
+
+```bash
+sudo docker network create quicc
+```
+
+Next run the server:
+
+```bash
+sudo docker run --rm -it --name quicc --network quicc quicc \
+  python3 http3_cc_server.py \
+  --certificate aioquic/tests/ssl_cert.pem \
+  --private-key aioquic/tests/ssl_key.pem
+```
+
+Finally run the client:
+
+```bash
+sudo docker run --rm -it --network quicc quicc \
+  python3 http3_cc_client.py \
+  --ca-certs aioquic/tests/pycacert.pem \
+  wss://quicc:4433/ws
+```
 
 ### Clone the repository and initialize submodules
 
@@ -42,7 +65,6 @@ the technique in action.
 git clone --recurse-submodules https://github.com/nuvious/QuiCC.git
 cd QuiCC
 ```
-
 
 ### Install Requirements
 
