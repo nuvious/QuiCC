@@ -145,7 +145,7 @@ openssl x509 -req -in csr.pem -out aioquic/tests/ssl_cert.pem \
   -extfile <(printf "subjectAltName=DNS:quicc.local\nkeyUsage=digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth,clientAuth\nbasicConstraints=CA:FALSE\nsubjectKeyIdentifier=hash\nauthorityKeyIdentifier=keyid,issuer\nauthorityInfoAccess=caIssuers;URI:http://testca.pythontest.net/testca/pycacert.cer,OCSP;URI:http://testca.pythontest.net/testca/ocsp/\ncrlDistributionPoints=URI:http://testca.pythontest.net/testca/revocation.crl")
 ```
 
-You'll then need to copy over the `pycacert.pem` and repace the
+You'll then need to copy over the `pycacert.pem` and replace the
 `aioquic/tests/pycacert.pem` file with it on the client machine.
 
 ## Known Issues
