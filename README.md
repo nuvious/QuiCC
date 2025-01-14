@@ -15,6 +15,12 @@ fields.
 
 ## Video Demonstration
 
+### ShmooCon 2025 Talk - On Covert Channels using Quic Protocol Headers
+
+[![ShmooCon 2025 Build It! - On Covert Channels using Quic Protocol Headers](https://img.youtube.com/vi/-_jUZBMeU5w/0.jpg)](https://youtu.be/-_jUZBMeU5w?si=u6OuMvBT4xSvUGJY&t=20854)
+
+### Initial Video Demonstration Jul, 2024
+
 [![QuiCC - A covert channel based on the quic protocol.](https://img.youtube.com/vi/5oHfefoECCE/0.jpg)](https://www.youtube.com/watch?v=5oHfefoECCE)
 
 NOTE: In the above demo the RSA bit strength is set to 1024. This was done only
