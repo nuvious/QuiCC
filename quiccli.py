@@ -45,17 +45,19 @@ class QuiCCli:
             key_bytes = get_compact_key(peer_meta['private_key'])
             open('client-public-key-client.bin', 'wb').write(key_bytes)
             queue_message(self.host_ip, key_bytes, peer_meta['cid_queue'], None, is_public_key=True)
-            peer_meta['cid_queue'].put(os.urandom(8))
+            # We need one final connection to get the last chunk of the server's CID queue so add
+            # an extra random CID at the end
+            peer_meta['cid_queue'].put(os.urandom(20))
             PEER_META[self.host_ip] = peer_meta
             PEER_META_LOCK.release()
-            self.send_message((RSA_BIT_STRENGTH // (8*8)) + 1) # Receive the server public key
+            self.send_message((RSA_BIT_STRENGTH // 128) + 1) # Receive the server public key
                 
     
     def send_message(self, count):
         print(f"SENDING {count} REQUESTS")
         send_urls = [self.urls[i % len(self.urls)] for i in range(count)]
         for i, url in enumerate(send_urls):
-            print(f"SENDING REQUEST {i}/{count}")
+            print(f"SENDING REQUEST {i+1}/{count}")
             asyncio.run(
                 self.send_function(
                     configuration=self.configuration,
