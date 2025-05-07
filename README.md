@@ -17,7 +17,7 @@ fields.
 
 ### ShmooCon 2025 Talk - On Covert Channels using Quic Protocol Headers
 
-[![ShmooCon 2025 Build It! - On Covert Channels using Quic Protocol Headers](assets/shmoocon_youtube_thumbnail.png)](https://youtu.be/-_jUZBMeU5w?si=u6OuMvBT4xSvUGJY&t=20854)
+[![ShmooCon 2025 Build It! - On Covert Channels using Quic Protocol Headers](assets/shmoocon_youtube_thumbnail.png)](https://www.youtube.com/watch?v=JnbYzd9nriw)
 
 ### Initial Video Demonstration Jul, 2024
 
